@@ -14,6 +14,7 @@ namespace WF.AimTest
         // 2 Buttons
         private Button btnIniciar;
         private Button btnAlvo;
+        private Label lblCont;
 
         // timer
         private System.Windows.Forms.Timer timer;
@@ -23,11 +24,13 @@ namespace WF.AimTest
 
         // Stopwatch
         private Stopwatch stopwatch;
-       
+
+        //contador de pontos
+        private int cont;
         List<Color> cores = new List<Color>() { Color.Red, Color.Blue, Color.Green, Color.Ivory, Color.Khaki};
         Random rand = new Random();
 
-
+        List<double> placar = new List<double>();
 
         // construtor da tela
         public Form1()
@@ -54,7 +57,7 @@ namespace WF.AimTest
 
             this.btnAlvo = new Button()
             {
-                Size = new Size(50, 50),
+                Size = new Size(100, 100),
                 BackColor = Color.Red,
                 Visible = false,
             };
@@ -71,10 +74,14 @@ namespace WF.AimTest
             random = new Random();
             stopwatch = new Stopwatch();
 
+
+            lblCont = new Label();
+            lblCont.Text = "...";
+            lblCont.Size = new Size(60, 180);
+            lblCont.Location = new Point(50, 50);
+            lblCont.Visible = true;
+            this.Controls.Add(lblCont);
             // fim construtor
-
-
-
 
         }
 
@@ -89,7 +96,7 @@ namespace WF.AimTest
 
         private void IniciarNovaRodada()
         {
-            timer.Interval = 10;
+            timer.Interval = 600;
             timer.Start();
         }
 
@@ -97,10 +104,12 @@ namespace WF.AimTest
         {
             // para o timer
             timer.Stop();
+            stopwatch.Restart();
             int x = random.Next(50, this.ClientSize.Width - 70);
             int y = random.Next(50, this.ClientSize.Height - 70);
             btnAlvo.Location = new Point(x, y);
             btnAlvo.Visible = true;
+
             // definir a cor aleatoria
             int aleatorio = random.Next(0, 4);
             btnAlvo.BackColor = cores.ElementAt(aleatorio);
@@ -115,18 +124,40 @@ namespace WF.AimTest
 
         private void btnAlvoClick(object sender, EventArgs e)
         {
+            stopwatch.Stop();
+            string placarTexto = "";
             if (btnAlvo.BackColor == Color.Blue)
             {
-                stopwatch.Stop();
+
+                // adivciona no placar
+                placar.Add(stopwatch.ElapsedMilliseconds);
+
+                // se placar ja tem 5
+                if (placar.Count() > 5)
+                {
+                    // remove a mais antiga
+                    placar.RemoveAt(0);
+                }
+
+                foreach (double placarAtual in placar)
+                {
+                    placarTexto += $"{placarAtual} ms \n";
+                }
+                lblCont.Text = placarTexto;
                 btnAlvo.Visible = false;
-                MessageBox.Show($"Tempo de reação: {stopwatch.ElapsedMilliseconds}", "ms");
+                // MessageBox.Show($"Tempo de reação: {stopwatch.ElapsedMilliseconds}", "ms");
                 Task.Delay(500).ContinueWith(_ => IniciarNovaRodada(),
-                TaskScheduler.FromCurrentSynchronizationContext());
+                 TaskScheduler.FromCurrentSynchronizationContext());
+               
             }
             else
             {
- 
-                
+                stopwatch.Stop();
+                placarTexto = "";
+                lblCont.Text = placarTexto;
+                MessageBox.Show($"Você Perdeu");
+                timer.Start();
+
             }
         }
 
