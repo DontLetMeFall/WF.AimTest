@@ -125,6 +125,7 @@ namespace WF.AimTest
         private void btnAlvoClick(object sender, EventArgs e)
         {
             stopwatch.Stop();
+            btnAlvo.Size = new Size(btnAlvo.Size.Width - 10, btnAlvo.Size.Width - 10);
             string placarTexto = "";
             if (btnAlvo.BackColor == Color.Blue)
             {
